@@ -1,0 +1,289 @@
+:root {
+  --primary-color: #1e3a8a;
+  --primary-dark: #0f172a;
+  --secondary-color: #d97706;
+  --accent-gold: #f59e0b;
+  --accent-gold-light: #fef3c7;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --font-main: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Roboto', sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--text-dark);
+  background-color: #ffffff;
+  line-height: 1.7;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+.brand-text {
+  font-family: var(--font-serif);
+  letter-spacing: -0.2px;
+}
+
+.main-navbar {
+  z-index: 1030;
+}
+
+/* Hero Section */
+.hero-section {
+  background: radial-gradient(circle at 80% 20%, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 90px;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.book-mockup-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.book-3d {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
+  box-shadow: -15px 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.2);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transform: perspective(1000px) rotateY(-8deg) rotateX(4deg);
+}
+
+.book-3d:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(245, 158, 11, 0.35);
+}
+
+.hero-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: #fde68a;
+  border-left: 3px solid var(--accent-gold);
+  padding-left: 18px;
+}
+
+/* Price Badges */
+.price-tag {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.original-price {
+  font-size: 1.25rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+/* Feature & Section Cards */
+.feature-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px 24px;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.07);
+  border-color: #cbd5e1;
+}
+
+.feature-icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* Author Section */
+.author-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+/* Press & Media Quotes */
+.press-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  height: 100%;
+  position: relative;
+}
+
+.press-card::before {
+  content: '“';
+  font-family: var(--font-serif);
+  font-size: 70px;
+  line-height: 1;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: #e2e8f0;
+  pointer-events: none;
+}
+
+/* Feedback & Reviews */
+.feedback-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+.star-rating {
+  color: #f59e0b;
+}
+
+/* Order Checkout Form */
+.order-section {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.order-box {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.order-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  color: #ffffff;
+  padding: 24px 30px;
+}
+
+.form-control, .form-select {
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.12);
+}
+
+.payment-method-card {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-method-card:hover {
+  border-color: var(--primary-color);
+  background-color: #f8fafc;
+}
+
+.form-check-input:checked ~ .payment-method-card {
+  border-color: var(--primary-color);
+  background-color: #eff6ff;
+}
+
+.btn-primary-custom {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 16px 28px;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3);
+}
+
+.btn-primary-custom:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(217, 119, 6, 0.4);
+  color: #ffffff;
+}
+
+/* Admin Dashboard */
+.stat-card {
+  border-radius: 16px;
+  border: none;
+  padding: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.table-custom {
+  vertical-align: middle;
+}
+
+.table-custom thead th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border-color);
+  padding: 14px 16px;
+}
+
+.badge-status {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.badge-cho-xu-ly { background-color: #fef3c7; color: #92400e; }
+.badge-dang-giao { background-color: #e0f2fe; color: #0369a1; }
+.badge-da-giao { background-color: #dcfce7; color: #166534; }
+.badge-da-huy { background-color: #fee2e2; color: #991b1b; }
+
+/* Footer */
+.footer-custom {
+  background-color: #0f172a;
+}
+
+.text-light-50 {
+  color: #94a3b8;
+}
+
+.hover-white:hover {
+  color: #ffffff !important;
+}

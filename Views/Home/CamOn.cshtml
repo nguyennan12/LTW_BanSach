@@ -1,0 +1,105 @@
+@model DonHang
+@using System.Globalization
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    var vn = CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header trạng thái -->
+                <div class="bg-success text-white text-center p-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-success rounded-circle mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-check-lg fs-1"></i>
+                    </div>
+                    <h2 class="fw-bold mb-1">ĐẶT HÀNG THÀNH CÔNG!</h2>
+                    <p class="mb-0 text-white-50">Cảm ơn bạn đã tin tưởng lựa chọn sách tại Nhà Sách Tri Thức.</p>
+                </div>
+
+                <div class="p-4 p-lg-5">
+                    <div class="alert alert-info border-0 rounded-3 d-flex align-items-center gap-3 mb-4">
+                        <i class="bi bi-info-circle-fill fs-4 text-info"></i>
+                        <div class="small">
+                            Mã đơn hàng của bạn là <b>#@Model.Id</b>. Nhân viên tư vấn sẽ liên hệ với bạn trong vòng 24h để xác nhận lịch giao hàng.
+                        </div>
+                    </div>
+
+                    <!-- Thông tin chi tiết đơn hàng -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Thông Tin Chi Tiết Đơn Hàng</h5>
+                    
+                    <div class="table-responsive mb-4">
+                        <table class="table table-borderless align-middle">
+                            <tbody class="small">
+                                <tr class="border-bottom">
+                                    <td class="text-muted" style="width: 35%;">Mã đơn hàng:</td>
+                                    <td class="fw-bold text-dark">#@Model.Id</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Ngày đặt hàng:</td>
+                                    <td class="fw-bold text-dark">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Họ tên người nhận:</td>
+                                    <td class="fw-bold text-dark">@Model.HoTen</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Số điện thoại:</td>
+                                    <td class="fw-bold text-dark">@Model.SoDienThoai</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Địa chỉ nhận hàng:</td>
+                                    <td class="fw-bold text-dark">@Model.DiaChi</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Sản phẩm đặt:</td>
+                                    <td class="fw-bold text-dark">
+                                        @Model.Sach?.Ten (Số lượng: <b>@Model.SoLuong</b> cuốn)
+                                    </td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted">Phương thức TT:</td>
+                                    <td class="fw-bold text-primary">
+                                        @(Model.PhuongThucThanhToan == "COD" ? "Thanh toán tiền mặt khi nhận hàng (COD)" : "Chuyển khoản Ngân hàng / QR Pay")
+                                    </td>
+                                </tr>
+                                @if (!string.IsNullOrEmpty(Model.GhiChu))
+                                {
+                                    <tr class="border-bottom">
+                                        <td class="text-muted">Ghi chú:</td>
+                                        <td class="text-dark">@Model.GhiChu</td>
+                                    </tr>
+                                }
+                                <tr class="bg-light">
+                                    <td class="fw-bold text-dark fs-6">Tổng tiền thanh toán:</td>
+                                    <td class="fw-bold text-danger fs-5">@Model.TongTien.ToString("N0", vn) đ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (Model.PhuongThucThanhToan == "ChuyenKhoan")
+                    {
+                        <div class="p-3 bg-light rounded-3 border border-primary border-opacity-25 mb-4 small">
+                            <h6 class="fw-bold text-primary mb-2"><i class="bi bi-qr-code me-1"></i>Thông tin chuyển khoản:</h6>
+                            <p class="mb-1">• Ngân hàng: <b>MB Bank (Ngân hàng Quân Đội)</b></p>
+                            <p class="mb-1">• Số tài khoản: <b>999988886666</b></p>
+                            <p class="mb-1">• Chủ tài khoản: <b>NHA SACH TRI THUC</b></p>
+                            <p class="mb-0">• Nội dung chuyển khoản: <span class="badge bg-warning text-dark">DH @Model.Id @Model.SoDienThoai</span></p>
+                        </div>
+                    }
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3">
+                        <a href="/" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay về trang chủ
+                        </a>
+                        <button onclick="window.print()" class="btn btn-light border rounded-pill px-3 py-2 text-muted">
+                            <i class="bi bi-printer me-1"></i> In đơn hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

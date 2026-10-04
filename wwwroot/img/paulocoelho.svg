@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34495e"/>
+      <stop offset="100%" stop-color="#1a252f"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#avatarGrad)" stroke="#f6d365" stroke-width="4"/>
+  <circle cx="100" cy="75" r="38" fill="#e0e0e0"/>
+  <path d="M 45 165 C 45 125, 155 125, 155 165 Z" fill="#ecf0f1"/>
+  <text x="100" y="82" font-family="'Roboto', sans-serif" font-size="28" font-weight="bold" fill="#2c3e50" text-anchor="middle">PC</text>
+  <text x="100" y="185" font-family="'Roboto', sans-serif" font-size="11" font-weight="bold" fill="#f6d365" text-anchor="middle">PAULO COELHO</text>
+</svg>

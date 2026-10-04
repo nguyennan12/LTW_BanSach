@@ -1,0 +1,57 @@
+## Visual Studio / .NET Build Artifacts
+[Bb]in/
+[Oo]bj/
+[Aa]rtifacts/
+out/
+Release/
+Debug/
+[Tt]est[Rr]esults/
+
+## Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.docstates
+*.ide/
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## SQLite Database & Temp Files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+bansach.db
+
+## Logs & Temp files
+*.log
+*.tmp
+*.temp
+log/
+logs/
+
+## OS Generated Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+## Node / Frontend (nếu có sau này)
+node_modules/
+npm-debug.log*
+
+## Sensitive configuration (tùy chọn)
+appsettings.*.local.json

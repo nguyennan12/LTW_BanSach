@@ -1,0 +1,465 @@
+@model LandingPageViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = Model.Sach.Ten;
+    var vn = CultureInfo.GetCultureInfo("vi-VN");
+    long tietKiem = Model.Sach.GiaGoc - Model.Sach.Gia;
+    int phanTramGiam = (int)Math.Round((double)tietKiem / Model.Sach.GiaGoc * 100);
+}
+
+<!-- Notification Alerts -->
+@if (TempData["SuccessMsg"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["SuccessMsg"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+@if (TempData["ErrorMsg"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>@TempData["ErrorMsg"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+<!-- 1. HERO SECTION -->
+<section class="hero-section" id="gioi-thieu">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-warning-subtle text-warning-emphasis fw-bold small mb-3 border border-warning">
+                    <i class="bi bi-fire"></i> Sách Bán Chạy Nhất Thế Giới (#1 Bestseller)
+                </div>
+                <h1 class="display-4 fw-extrabold text-white mb-3">
+                    @Model.Sach.Ten
+                </h1>
+                <p class="hero-quote mb-4">
+                    “@Model.Sach.Subtitle”
+                </p>
+                <p class="lead text-light mb-4" style="opacity: 0.9;">
+                    @Model.Sach.MoTa
+                </p>
+
+                <!-- Giá & Khuyến mãi -->
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-50">
+                    <div>
+                        <div class="small text-warning text-uppercase fw-bold">Giá ưu đãi hôm nay:</div>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <span class="price-tag">@Model.Sach.Gia.ToString("N0", vn)đ</span>
+                            <span class="original-price">@Model.Sach.GiaGoc.ToString("N0", vn)đ</span>
+                        </div>
+                    </div>
+                    <div class="ms-auto text-end">
+                        <span class="badge bg-danger fs-6 px-3 py-2">Tiết kiệm -@phanTramGiam%</span>
+                        <div class="small text-success mt-1"><i class="bi bi-check2-circle"></i> Miễn phí vận chuyển</div>
+                    </div>
+                </div>
+
+                <!-- Call to Actions -->
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#dat-hang" class="btn btn-warning btn-lg px-4 py-3 fw-bold text-dark rounded-pill shadow d-flex align-items-center gap-2">
+                        <i class="bi bi-bag-check-fill fs-5"></i> Đặt Mua Ngay Bây Giờ
+                    </a>
+                    <a href="#review" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-down-circle"></i> Tìm hiểu nội dung
+                    </a>
+                </div>
+
+                <div class="d-flex align-items-center gap-4 mt-4 pt-2 text-white-50 small">
+                    <div><i class="bi bi-shield-check text-warning me-1"></i> Sách mới 100% chính hãng</div>
+                    <div><i class="bi bi-truck text-warning me-1"></i> Giao hàng toàn quốc</div>
+                    <div><i class="bi bi-box-seam text-warning me-1"></i> Còn lại: <b>@Model.Sach.SoLuongTon</b> cuốn</div>
+                </div>
+            </div>
+
+            <!-- Ảnh Mockup Sách -->
+            <div class="col-lg-5 text-center">
+                <div class="book-mockup-wrapper">
+                    <img src="~/img/nhagiakim.jpg" alt="@Model.Sach.Ten" class="book-3d img-fluid" />
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x bg-dark bg-opacity-90 text-white px-4 py-2 rounded-pill shadow border border-warning d-flex align-items-center gap-2 mt-3" style="width: max-content;">
+                        <div class="star-rating"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                        <span class="fw-bold">4.9 / 5.0</span>
+                        <span class="text-white-50">(2.4k+ đánh giá)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. REVIEW NỘI DUNG SECTION -->
+<section class="py-5 bg-light" id="review">
+    <div class="container py-4">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase tracking-wide small">Khám phá tuyệt tác</span>
+            <h2 class="display-6 fw-bold text-dark mt-1">Nội Dung & Giá Trị Cốt Lõi</h2>
+            <p class="text-muted">Tại sao Nhà Giả Kim trở thành cuốn sách gối đầu giường của hàng chục triệu người trên thế giới?</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-compass"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Hành Trình Đi Tìm Ước Mơ</h4>
+                    <p class="text-muted mb-0">
+                        Theo chân Santiago vượt qua sa mạc Sahara để tìm kiếm kho báu Kim Tự Tháp, bạn sẽ nhận ra mọi ước mơ đều xứng đáng được theo đuổi đến cùng.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-box bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Ngôn Ngữ Của Vũ Trụ</h4>
+                    <p class="text-muted mb-0">
+                        Vũ trụ luôn gửi đến những dấu hiệu chỉ đường. Điều quan trọng là bạn phải đủ can đảm, kiên nhẫn và lắng nghe tiếng nói sâu thẳm từ con tim.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-box bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-gem"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Kho Báu Thật Sự</h4>
+                    <p class="text-muted mb-0">
+                        Giá trị lớn nhất không phải là đống vàng dưới chân Kim Tự Tháp, mà chính là sự trưởng thành, trải nghiệm và bản lĩnh bạn tích lũy được trên đường đi.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trích đoạn phân tích sâu -->
+        <div class="card border-0 shadow-sm p-4 p-lg-5 rounded-4 bg-white">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <h4 class="fw-bold text-dark mb-3"><i class="bi bi-quote text-warning me-2 fs-3"></i>Đánh giá & Cảm nhận tác phẩm</h4>
+                    <p class="text-muted lh-lg mb-0">
+                        @Model.Sach.ReviewNoiDung
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center border-start-lg ps-lg-4">
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="display-6 fw-bold text-primary">65+ Triệu</div>
+                        <div class="text-muted small">Bản in bán ra toàn cầu</div>
+                    </div>
+                    <div class="p-3 bg-light rounded-3 mt-3">
+                        <div class="display-6 fw-bold text-success">80+ Ngôn ngữ</div>
+                        <div class="text-muted small">Được dịch và phát hành khắp thế giới</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. CHI TIẾT TÁC GIẢ -->
+<section class="py-5" id="tac-gia">
+    <div class="container py-4">
+        <div class="author-card p-4 p-lg-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-4 text-center">
+                    <img src="~/img/paulocoelho.png" asp-append-version="true" alt="@Model.Sach.TacGia" class="img-fluid rounded-circle shadow-lg mb-3 border border-3 border-warning" style="width: 190px; height: 190px; object-fit: cover;" />
+                    <h4 class="fw-bold mb-1">@Model.Sach.TacGia</h4>
+                    <span class="badge bg-primary px-3 py-1">Đại sứ hòa bình LHQ</span>
+                </div>
+                <div class="col-lg-8">
+                    <span class="text-primary fw-bold text-uppercase small">Người truyền cảm hứng vĩ đại</span>
+                    <h3 class="fw-bold text-dark mt-1 mb-3">Về Tác Giả Paulo Coelho</h3>
+                    <p class="text-muted lh-lg mb-4">
+                        @Model.Sach.ThongTinTacGia
+                    </p>
+                    <blockquote class="p-3 bg-white rounded-3 border-start border-4 border-warning fst-italic text-secondary mb-0 shadow-sm">
+                        “Bí quyết cuộc sống là hãy ngã xuống 7 lần và đứng dậy 8 lần.” — Paulo Coelho
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. BÁO CHÍ & TRUYỀN THÔNG NÓI GÌ -->
+<section class="py-5 bg-light" id="bao-chi">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Báo chí quốc tế</span>
+            <h2 class="display-6 fw-bold text-dark mt-1">Báo Chí & Giới Phê Bình Nói Gì?</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="press-card">
+                    <h5 class="fw-bold text-primary mb-2">The New York Times</h5>
+                    <p class="text-muted small mb-3">“Một câu chuyện ngụ ngôn tuyệt vời, đầy ma thuật và phép màu. Cuốn sách giúp ta thấu hiểu cách vũ trụ đối thoại với ước mơ của con người.”</p>
+                    <div class="text-secondary small fw-semibold">— Phê bình văn học quốc tế</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="press-card">
+                    <h5 class="fw-bold text-primary mb-2">The Washington Post</h5>
+                    <p class="text-muted small mb-3">“Paulo Coelho đã biến câu chuyện của chàng chăn cừu thành một bản hùng ca bất hủ về niềm tin, ý chí và sự tỉnh thức trong tâm hồn.”</p>
+                    <div class="text-secondary small fw-semibold">— Tạp chí Sách & Đời Sống</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="press-card">
+                    <h5 class="fw-bold text-primary mb-2">Báo Tuổi Trẻ</h5>
+                    <p class="text-muted small mb-3">“Một trong những cuốn sách đáng đọc nhất thời đại. Dù ở bất cứ độ tuổi nào, đọc Nhà Giả Kim đều mang lại những góc nhìn sống đắt giá.”</p>
+                    <div class="text-secondary small fw-semibold">— Chuyên mục Văn Hóa</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. FEEDBACK & ĐÁNH GIÁ ĐỘC GIẢ -->
+<section class="py-5" id="feedback">
+    <div class="container py-4">
+        <div class="row align-items-end mb-4">
+            <div class="col-md-8">
+                <span class="text-primary fw-bold text-uppercase small">Độc giả nhận xét</span>
+                <h2 class="display-6 fw-bold text-dark mt-1">Đánh Giá Từ Khách Hàng</h2>
+                <p class="text-muted mb-0">Hơn 98% độc giả hài lòng về chất lượng nội dung và dịch vụ giao nhận sách.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-outline-primary fw-semibold rounded-pill" data-bs-toggle="collapse" data-bs-target="#formFeedbackCollapse">
+                    <i class="bi bi-pencil-square me-1"></i> Viết đánh giá của bạn
+                </button>
+            </div>
+        </div>
+
+        <!-- Form gửi Feedback -->
+        <div class="collapse mb-5" id="formFeedbackCollapse">
+            <div class="card border-0 shadow-sm p-4 rounded-4 bg-light">
+                <h5 class="fw-bold mb-3">Gửi cảm nhận của bạn về cuốn sách</h5>
+                <form asp-action="GuiFeedback" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Họ và tên của bạn</label>
+                            <input asp-for="FeedbackForm.HoTen" class="form-control" placeholder="VD: Nguyễn Văn A" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Đánh giá số sao</label>
+                            <select asp-for="FeedbackForm.SoSao" class="form-select">
+                                <option value="5">⭐⭐⭐⭐⭐ (5/5 Sao - Tuyệt vời)</option>
+                                <option value="4">⭐⭐⭐⭐ (4/5 Sao - Rất hay)</option>
+                                <option value="3">⭐⭐⭐ (3/5 Sao - Khá tốt)</option>
+                                <option value="2">⭐⭐ (2/5 Sao - Bình thường)</option>
+                                <option value="1">⭐ (1/5 Sao - Chưa ưng ý)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Nội dung đánh giá</label>
+                            <textarea asp-for="FeedbackForm.NoiDung" class="form-control" rows="3" placeholder="Chia sẻ cảm nhận sau khi đọc sách hoặc trải nghiệm nhận hàng..." required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary fw-bold px-4 py-2 rounded-pill">
+                                <i class="bi bi-send me-1"></i> Gửi đánh giá ngay
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Grid Feedback Cards -->
+        <div class="row g-4">
+            @if (Model.Feedbacks != null && Model.Feedbacks.Any())
+            {
+                @foreach (var fb in Model.Feedbacks)
+                {
+                    <div class="col-md-4">
+                        <div class="feedback-card d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="star-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= fb.SoSao)
+                                            {
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <span class="text-muted small">@fb.NgayDanhGia.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <p class="text-dark small mb-3">“@fb.NoiDung”</p>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 14px;">
+                                    @(string.IsNullOrEmpty(fb.HoTen) ? "K" : fb.HoTen.Substring(0, 1).ToUpper())
+                                </div>
+                                <div>
+                                    <div class="fw-bold small text-dark">@fb.HoTen</div>
+                                    <div class="text-success small" style="font-size: 11px;"><i class="bi bi-patch-check-fill"></i> Đã mua hàng</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center text-muted py-4">Chưa có đánh giá nào. Hãy là người đầu tiên để lại nhận xét!</div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- 6. FORM ĐẶT HÀNG TRỰC TUYẾN -->
+<section class="py-5 order-section" id="dat-hang">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="order-box">
+                    <div class="order-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <span class="badge bg-warning text-dark fw-bold mb-1">Ưu Đãi Hôm Nay</span>
+                            <h3 class="fw-bold text-white mb-0 font-serif">ĐẶT MUA SÁCH TRỰC TUYẾN</h3>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-white-50 small">Giá niêm yết:</span>
+                            <div class="text-warning fw-bold fs-4">@Model.Sach.Gia.ToString("N0", vn) đ/cuốn</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 p-lg-5">
+                        <form asp-controller="Home" asp-action="DatHang" method="post" id="orderForm">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="row g-4">
+                                <!-- Họ tên -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-person text-primary me-1"></i>Họ và tên người nhận <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="DatHangForm.HoTen" class="form-control form-control-lg" placeholder="Nhập họ và tên đầy đủ..." />
+                                    <span asp-validation-for="DatHangForm.HoTen" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Số điện thoại -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-telephone text-primary me-1"></i>Số điện thoại <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="DatHangForm.SoDienThoai" class="form-control form-control-lg" placeholder="VD: 0987654321" inputmode="numeric" />
+                                    <span asp-validation-for="DatHangForm.SoDienThoai" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Địa chỉ -->
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-geo-alt text-primary me-1"></i>Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="DatHangForm.DiaChi" class="form-control form-control-lg" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành..." />
+                                    <span asp-validation-for="DatHangForm.DiaChi" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Số lượng -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-123 text-primary me-1"></i>Số lượng đặt mua <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQty(-1)">-</button>
+                                        <input asp-for="DatHangForm.SoLuong" id="inputSoLuong" type="number" min="1" max="20" class="form-control text-center fw-bold" onchange="calculateTotal()" />
+                                        <button class="btn btn-outline-secondary" type="button" onclick="changeQty(1)">+</button>
+                                    </div>
+                                    <span asp-validation-for="DatHangForm.SoLuong" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Phương thức thanh toán -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-credit-card text-primary me-1"></i>Phương thức thanh toán
+                                    </label>
+                                    <div class="d-flex flex-column gap-2">
+                                        <label class="payment-method-card d-flex align-items-center gap-3">
+                                            <input class="form-check-input mt-0" type="radio" asp-for="DatHangForm.PhuongThucThanhToan" value="COD" checked>
+                                            <div>
+                                                <div class="fw-bold small">Thanh toán khi nhận hàng (COD)</div>
+                                                <div class="text-muted" style="font-size: 11px;">Kiểm tra sách rồi mới trả tiền cho shipper</div>
+                                            </div>
+                                        </label>
+                                        <label class="payment-method-card d-flex align-items-center gap-3">
+                                            <input class="form-check-input mt-0" type="radio" asp-for="DatHangForm.PhuongThucThanhToan" value="ChuyenKhoan">
+                                            <div>
+                                                <div class="fw-bold small">Chuyển khoản Ngân hàng / QR Pay</div>
+                                                <div class="text-muted" style="font-size: 11px;">Chuyển khoản nhanh qua Internet Banking</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Ghi chú đơn hàng -->
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-chat-left-text text-primary me-1"></i>Ghi chú thêm (nếu có)
+                                    </label>
+                                    <input asp-for="DatHangForm.GhiChu" class="form-control" placeholder="VD: Giao giờ hành chính, gọi trước khi giao..." />
+                                </div>
+
+                                <!-- Tóm tắt tiền -->
+                                <div class="col-12">
+                                    <div class="p-3 bg-light rounded-3 border d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                        <div>
+                                            <span class="text-muted">Tổng cộng thanh toán:</span>
+                                            <div class="fw-extrabold text-danger fs-3" id="displayTongTien">
+                                                @((Model.Sach.Gia * (Model.DatHangForm.SoLuong > 0 ? Model.DatHangForm.SoLuong : 1)).ToString("N0", vn)) đ
+                                            </div>
+                                            <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-truck me-1"></i> Miễn phí vận chuyển toàn quốc</span>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary-custom px-4 py-3 d-flex align-items-center gap-2">
+                                            <i class="bi bi-cart-check-fill fs-5"></i> XÁC NHẬN ĐẶT HÀNG NGAY
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript tính tiền động -->
+<script>
+    const donGia = @Model.Sach.Gia;
+
+    function changeQty(delta) {
+        const input = document.getElementById('inputSoLuong');
+        let current = parseInt(input.value) || 1;
+        current += delta;
+        if (current < 1) current = 1;
+        if (current > 20) current = 20;
+        input.value = current;
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        const input = document.getElementById('inputSoLuong');
+        let qty = parseInt(input.value) || 1;
+        if (qty < 1) qty = 1;
+        if (qty > 20) qty = 20;
+        input.value = qty;
+
+        const total = qty * donGia;
+        document.getElementById('displayTongTien').innerText = total.toLocaleString('vi-VN') + ' đ';
+    }
+</script>
