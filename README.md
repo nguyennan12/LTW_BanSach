@@ -1,22 +1,35 @@
-# BanSach – web bán MỘT cuốn sách (ASP.NET Core 8 MVC)
+# BanSach – Landing Page Bán Sách "Nhà Giả Kim" (ASP.NET Core 8.0 MVC)
 
-## Chạy
-1. Cài .NET 8 SDK: https://dotnet.microsoft.com/download
-2. Mở terminal trong thư mục dự án:
-       dotnet run
-3. Mở địa chỉ hiện ra (vd http://localhost:5000).
+Website bán sách trực tuyến theo mô hình chuẩn **3-Tier Clean Architecture (View $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ DbContext $\rightarrow$ SQLite)** với giao diện hiện đại, tối ưu trải nghiệm đặt hàng cho độc giả.
 
-## Sửa thông tin sách
-Mở `Data/AppDbContext.cs`, sửa tên, tác giả, mô tả, giá, số lượng.
-Đổi ảnh bìa: thay file `wwwroot/img/bia.svg`.
-Làm TRƯỚC khi chạy lần đầu. Nếu đã chạy rồi, xóa file `bansach.db` rồi chạy lại.
+---
 
-## Xem đơn hàng
-Vào: /QuanTri?key=MẬT_KHẨU
-Mật khẩu đặt ở `appsettings.json` (mục QuanTri > MatKhau) — nhớ đổi.
+## 🎥 Video Demo Hoạt Động
+* **Link xem video demo trực tiếp:** [Google Drive Demo Video](https://drive.google.com/file/d/1XTNxmDQ81E89QU0wkf3fr9kuv8cz100P/view?usp=sharing)
 
-## Cấu trúc MVC
-- Models/        (M) : Sach, DonHang, DatHangViewModel
-- Views/         (V) : Home/Index, Home/CamOn, QuanTri/Index, Shared/_Layout
-- Controllers/   (C) : HomeController (đặt hàng), QuanTriController (xem đơn)
-- Data/AppDbContext  : kết nối database (SQLite, file bansach.db)
+---
+
+## 🚀 Hướng Dẫn Chạy Dự Án (Getting Started)
+
+### 1. Yêu cầu môi trường
+* Đã cài đặt [.NET 8 SDK](https://dotnet.microsoft.com/download)
+
+### 2. Các bước khởi chạy
+Mở Terminal trong thư mục dự án và chạy lệnh:
+
+```bash
+# Khôi phục dependencies và chạy ứng dụng
+dotnet run --urls="http://localhost:5000"
+```
+
+Mở trình duyệt truy cập: 👉 **[http://localhost:5000](http://localhost:5000)**
+
+---
+
+## 🔄 Luồng Xử Lý Đặt Hàng (Order Flow)
+1. **Khách hàng điền form:** Chọn số lượng, họ tên, số điện thoại, địa chỉ và phương thức thanh toán tại `Index.cshtml`.
+2. **Controller tiếp nhận:** `HomeController.DatHang` kiểm tra validation hợp lệ.
+3. **Service xử lý:** `DonHangService.TaoDonHangAsync` kiểm tra tồn kho, trừ số lượng tồn và lưu đơn hàng vào SQLite.
+4. **Trả kết quả:** Chuyển hướng sang trang hóa đơn `Home/CamOn/{id}`.
+
+*(Chi tiết xem thêm tại file [FLOW_XU_LY.md](FLOW_XU_LY.md))*
