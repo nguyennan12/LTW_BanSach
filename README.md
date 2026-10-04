@@ -2,12 +2,9 @@
 
 Website bán sách trực tuyến theo mô hình chuẩn **3-Tier Clean Architecture (View $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ DbContext $\rightarrow$ SQLite)** với giao diện hiện đại, tối ưu trải nghiệm đặt hàng cho độc giả.
 
----
 
 ## 🎥 Video Demo Hoạt Động
 * **Link xem video demo trực tiếp:** [Google Drive Demo Video](https://drive.google.com/file/d/1XTNxmDQ81E89QU0wkf3fr9kuv8cz100P/view?usp=sharing)
-
----
 
 ## 🚀 Hướng Dẫn Chạy Dự Án (Getting Started)
 
