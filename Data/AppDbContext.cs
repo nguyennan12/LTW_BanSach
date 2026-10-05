@@ -14,13 +14,16 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder b)
     {
-        // 1. Seed tài khoản Admin và User mặc định
+        // 1. Seed tài khoản Admin và User mặc định 
+        string adminHash = BCrypt.Net.BCrypt.HashPassword("admin123");
+        string userHash = BCrypt.Net.BCrypt.HashPassword("123456");
+
         b.Entity<NguoiDung>().HasData(
             new NguoiDung
             {
                 Id = 1,
                 TenDangNhap = "admin",
-                MatKhau = "admin123", // Mật khẩu Admin
+                MatKhau = adminHash, 
                 HoTen = "Quản Trị Viên",
                 SoDienThoai = "0988888888",
                 DiaChi = "Hà Nội",
@@ -31,7 +34,7 @@ public class AppDbContext : DbContext
             {
                 Id = 2,
                 TenDangNhap = "khachhang",
-                MatKhau = "123456", // Mật khẩu User
+                MatKhau = userHash, 
                 HoTen = "Nguyễn Văn Khách",
                 SoDienThoai = "0912345678",
                 DiaChi = "123 Đường Sách, Quận 1, TP. Hồ Chí Minh",
@@ -90,6 +93,55 @@ public class AppDbContext : DbContext
                 NoiDung = "'Khi bạn khao khát một điều gì đó, cả vũ trụ sẽ hợp lực...' - Câu nói làm thay đổi hoàn toàn cách nhìn cuộc sống của mình.",
                 NgayDanhGia = new DateTime(2026, 9, 28),
                 Duyet = true
+            }
+        );
+
+        // 4. Seed một số đơn hàng mẫu để Admin Dashboard hiển thị đầy đủ KPI
+        b.Entity<DonHang>().HasData(
+            new DonHang
+            {
+                Id = 1,
+                SachId = 1,
+                NguoiDungId = 2,
+                HoTen = "Nguyễn Văn Khách",
+                SoDienThoai = "0912345678",
+                DiaChi = "123 Đường Sách, Quận 1, TP. Hồ Chí Minh",
+                PhuongThucThanhToan = "COD",
+                GhiChu = "Giao giờ hành chính",
+                SoLuong = 2,
+                TongTien = 178000,
+                NgayDat = new DateTime(2026, 10, 1, 9, 30, 0),
+                TrangThai = "Đã giao"
+            },
+            new DonHang
+            {
+                Id = 2,
+                SachId = 1,
+                NguoiDungId = 2,
+                HoTen = "Trần Thanh Tâm",
+                SoDienThoai = "0987654321",
+                DiaChi = "45 Lê Duẩn, Quận Hải Châu, Đà Nẵng",
+                PhuongThucThanhToan = "ChuyenKhoan",
+                GhiChu = "Đã chuyển khoản qua app",
+                SoLuong = 1,
+                TongTien = 89000,
+                NgayDat = new DateTime(2026, 10, 3, 14, 15, 0),
+                TrangThai = "Đang giao"
+            },
+            new DonHang
+            {
+                Id = 3,
+                SachId = 1,
+                NguoiDungId = 2,
+                HoTen = "Phạm Hoàng Long",
+                SoDienThoai = "0934567890",
+                DiaChi = "88 Cầu Giấy, Quận Cầu Giấy, Hà Nội",
+                PhuongThucThanhToan = "COD",
+                GhiChu = "Gọi trước khi giao 15 phút",
+                SoLuong = 1,
+                TongTien = 89000,
+                NgayDat = new DateTime(2026, 10, 5, 8, 0, 0),
+                TrangThai = "Chờ xử lý"
             }
         );
     }

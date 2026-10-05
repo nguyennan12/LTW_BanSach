@@ -1,21 +1,24 @@
-using BanSach.Data;
 using BanSach.Models;
-using Microsoft.EntityFrameworkCore;
+using BanSach.Repositories.Interfaces;
+using BanSach.Services.Interfaces;
+using BanSach.ViewModels;
 
 namespace BanSach.Services;
 
 public class DonHangService : IDonHangService
 {
-    private readonly AppDbContext _db;
+    private readonly IDonHangRepository _donHangRepo;
+    private readonly ISachRepository _sachRepo;
 
-    public DonHangService(AppDbContext db)
+    public DonHangService(IDonHangRepository donHangRepo, ISachRepository sachRepo)
     {
-        _db = db;
+        _donHangRepo = donHangRepo;
+        _sachRepo = sachRepo;
     }
 
     public async Task<(bool ThanhCong, string? ThongBaoLoi, DonHang? DonHang)> TaoDonHangAsync(DatHangViewModel model, int? nguoiDungId = null)
     {
-        var sach = await _db.Sach.FirstOrDefaultAsync();
+        var sach = await _sachRepo.GetFirstAsync();
         if (sach == null)
         {
             return (false, "Không tìm thấy thông tin sản phẩm sách.", null);
@@ -46,73 +49,38 @@ public class DonHangService : IDonHangService
             TrangThai = "Chờ xử lý"
         };
 
-        // Giảm số lượng tồn kho
+        // Giảm số lượng tồn kho của sách thông qua SachRepository
         sach.SoLuongTon -= model.SoLuong;
-        _db.DonHang.Add(donHang);
-        await _db.SaveChangesAsync();
+        await _sachRepo.UpdateAsync(sach);
 
-        return (true, null, donHang);
+        // Lưu đơn hàng qua DonHangRepository
+        var createdDonHang = await _donHangRepo.AddAsync(donHang);
+
+        return (true, null, createdDonHang);
     }
 
     public async Task<DonHang?> LayDonHangTheoIdAsync(int id)
     {
-        return await _db.DonHang
-            .Include(d => d.Sach)
-            .Include(d => d.NguoiDung)
-            .FirstOrDefaultAsync(d => d.Id == id);
+        return await _donHangRepo.GetByIdAsync(id);
     }
 
     public async Task<List<DonHang>> LayDanhSachDonHangAsync(string? trangThai = null, string? timKiem = null)
     {
-        var query = _db.DonHang
-            .Include(d => d.Sach)
-            .Include(d => d.NguoiDung)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(trangThai) && trangThai != "Tất cả")
-        {
-            query = query.Where(d => d.TrangThai == trangThai);
-        }
-
-        if (!string.IsNullOrWhiteSpace(timKiem))
-        {
-            var key = timKiem.Trim().ToLower();
-            query = query.Where(d => d.HoTen.ToLower().Contains(key) ||
-                                     d.SoDienThoai.Contains(key) ||
-                                     d.DiaChi.ToLower().Contains(key) ||
-                                     d.Id.ToString() == key);
-        }
-
-        return await query.OrderByDescending(d => d.Id).ToListAsync();
+        return await _donHangRepo.GetAllAsync(trangThai, timKiem);
     }
 
     public async Task<List<DonHang>> LayDanhSachDonHangCuaUserAsync(int nguoiDungId)
     {
-        return await _db.DonHang
-            .Include(d => d.Sach)
-            .Where(d => d.NguoiDungId == nguoiDungId)
-            .OrderByDescending(d => d.Id)
-            .ToListAsync();
+        return await _donHangRepo.GetByUserIdAsync(nguoiDungId);
     }
 
     public async Task<bool> CapNhatTrangThaiAsync(int id, string trangThaiMoi)
     {
-        var don = await _db.DonHang.FindAsync(id);
-        if (don == null) return false;
-
-        don.TrangThai = trangThaiMoi;
-        await _db.SaveChangesAsync();
-        return true;
+        return await _donHangRepo.UpdateStatusAsync(id, trangThaiMoi);
     }
 
     public async Task<(int TongDon, int DonMoi, int DaGiao, long TongDoanhThu)> LayThongKeAsync()
     {
-        var tatCa = await _db.DonHang.ToListAsync();
-        int tongDon = tatCa.Count;
-        int donMoi = tatCa.Count(d => d.TrangThai == "Chờ xử lý");
-        int daGiao = tatCa.Count(d => d.TrangThai == "Đã giao");
-        long tongDoanhThu = tatCa.Where(d => d.TrangThai != "Đã hủy").Sum(d => d.TongTien);
-
-        return (tongDon, donMoi, daGiao, tongDoanhThu);
+        return await _donHangRepo.GetStatsAsync();
     }
 }

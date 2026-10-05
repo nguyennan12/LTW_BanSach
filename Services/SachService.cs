@@ -1,31 +1,30 @@
-using BanSach.Data;
 using BanSach.Models;
-using Microsoft.EntityFrameworkCore;
+using BanSach.Repositories.Interfaces;
+using BanSach.Services.Interfaces;
 
 namespace BanSach.Services;
 
 public class SachService : ISachService
 {
-    private readonly AppDbContext _db;
+    private readonly ISachRepository _sachRepo;
 
-    public SachService(AppDbContext db)
+    public SachService(ISachRepository sachRepo)
     {
-        _db = db;
+        _sachRepo = sachRepo;
     }
 
     public async Task<Sach?> LaySachChinhAsync()
     {
-        return await _db.Sach.FirstOrDefaultAsync();
+        return await _sachRepo.GetFirstAsync();
     }
 
     public async Task<Sach?> LaySachTheoIdAsync(int id)
     {
-        return await _db.Sach.FindAsync(id);
+        return await _sachRepo.GetByIdAsync(id);
     }
 
     public async Task CapNhatSachAsync(Sach sach)
     {
-        _db.Sach.Update(sach);
-        await _db.SaveChangesAsync();
+        await _sachRepo.UpdateAsync(sach);
     }
 }

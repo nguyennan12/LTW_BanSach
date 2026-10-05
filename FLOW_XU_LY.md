@@ -1,187 +1,178 @@
-# 📘 TÀI LIỆU CHI TIẾT: FLOW ĐẶT HÀNG SÁCH (BOOK ORDER FLOW)
+# 📘 TÀI LIỆU TOÀN DIỆN: KIẾN TRÚC HỆ THỐNG & LUỒNG XỬ LÝ DỮ LIỆU
 **Dự án:** Web Bán Sách "Nhà Giả Kim" (ASP.NET Core 8.0 MVC)  
-**Kiến trúc:** Clean 3-Tier Architecture (View $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ DbContext $\rightarrow$ SQLite)
+**Kiến trúc:** Clean 4-Tier Architecture (**View $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ Repository $\rightarrow$ DbContext $\rightarrow$ SQLite**)  
+**Bảo mật:** Băm mật khẩu bằng thuật toán **BCrypt (kèm Salt ngẫu nhiên)** + Xác thực **JWT Token** & Cookie Claims.
 
 ---
 
-## 🧭 TỔNG QUAN LUỒNG ĐẶT HÀNG (END-TO-END)
+## 📑 MỤC LỤC
+1. [Sơ đồ kiến trúc 4 tầng hoàn chỉnh (Architecture Overview)](#1-sơ-đồ-kiến-trúc-4-tầng-hoàn-chỉnh)
+2. [Cơ chế băm mật khẩu bảo mật (BCrypt Hashing)](#2-cơ-chế-băm-mật-khẩu-bảo-mật-bcrypt-hashing)
+3. [Luồng 1: Đăng nhập & Xác thực JWT Token (Auth Flow)](#3-luồng-1-đăng-nhập--xác-thực-jwt-token-auth-flow)
+4. [Luồng 2: Đăng ký thành viên mới (Register Flow)](#4-luồng-2-đăng-ký-thành-viên-mới-register-flow)
+5. [Luồng 3: Đặt mua sách trực tuyến (Customer Order Flow)](#5-luồng-3-đặt-mua-sách-trực-tuyến-customer-order-flow)
+6. [Luồng 4: Admin quản lý hóa đơn & thống kê doanh thu (Admin Management Flow)](#6-luồng-4-admin-quản-lý-hóa-đơn--thống-kê-doanh-thu-admin-management-flow)
+7. [Bảng tổng hợp ánh xạ Controller - Service - Repository - Database](#7-bảng-tổng-hợp-ánh-xạ-controller---service---repository---database)
+
+---
+
+## 1. SƠ ĐỒ KIẾN TRÚC 4 TẦNG HOÀN CHỈNH
 
 ```
-[Khách Hàng Điền Form & Submit]
-               │
-               ▼ (HTTP POST /Home/DatHang)
-[HomeController] 
-   ├── 1. Kiểm tra Annotation dữ liệu (ModelState.IsValid)
-   └── 2. Gọi IDonHangService.TaoDonHangAsync(datHangForm)
-               │
-               ▼ (Gọi nghiệp vụ Business Logic)
-[DonHangService]
-   ├── 3. Kiểm tra thông tin sách & Số lượng tồn kho (SoLuongTon)
-   ├── 4. Trừ số lượng tồn kho (SoLuongTon -= SoLuong)
-   ├── 5. Tạo thực thể DonHang (TrangThai = 'Chờ xử lý')
-   └── 6. Lưu vào Database qua AppDbContext.SaveChangesAsync()
-               │
-               ▼ (Trả kết quả về Controller)
-[HomeController]
-   ├── Thành công: RedirectToAction("CamOn", new { id = donHang.Id })
-   └── Thất bại: Trả về View("Index") kèm thông báo lỗi đỏ
-               │
-               ▼
-[Trang Cảm Ơn / Hóa Đơn (CamOn.cshtml)]
+┌──────────────────────────────────────────────────────────────┐
+│                    1. GIAO DIỆN (VIEW)                       │
+│    Razor Views (.cshtml), ViewModels, Bootstrap 5, AJAX/JS   │
+└──────────────────────────────┬───────────────────────────────┘
+                               │ HTTP Request (GET/POST)
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                  2. ĐIỀU KHIỂN (CONTROLLERS)                 │
+│  - AccountController: Đăng nhập, Đăng ký, Lịch sử đơn hàng   │
+│  - HomeController: Đặt mua sách, Review nội dung, Hóa đơn    │
+│  - QuanTriController: Quản lý hóa đơn, Duyệt giao, Thống kê  │
+└──────────────────────────────┬───────────────────────────────┘
+                               │ Gọi hàm nghiệp vụ (Business Call)
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                 3. DỊCH VỤ (SERVICE LAYER)                   │
+│  - AuthService: Băm BCrypt & So khớp mật khẩu               │
+│  - JwtService: Ký & Giải mã JWT Token bằng HMAC-SHA256       │
+│  - DonHangService: Kiểm tra tồn kho, Tính tiền, Điều phối    │
+│  - SachService & FeedbackService: Xử lý sách & Đánh giá      │
+└──────────────────────────────┬───────────────────────────────┘
+                               │ Gọi truy xuất dữ liệu (Data Call)
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│               4. TRUY XUẤT DỮ LIỆU (REPOSITORY LAYER)        │
+│  - DonHangRepository: CRUD hóa đơn, Thống kê, Filter LINQ    │
+│  - NguoiDungRepository: Tìm theo username/id, Thêm user      │
+│  - SachRepository: Lấy thông tin sách, Cập nhật tồn kho      │
+│  - FeedbackRepository: Lấy review đã duyệt, Thêm feedback    │
+└──────────────────────────────┬───────────────────────────────┘
+                               │ Entity Framework Core (LINQ)
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│               5. CƠ SỞ DỮ LIỆU (DATABASE CONTEXT)            │
+│         AppDbContext ──▶ SQLite Database (bansach.db)        │
+│         (Bảng: NguoiDung, Sach, DonHang, Feedback)           │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🔍 CHI TIẾT TỪNG BƯỚC XỬ LÝ TRONG CODE
+## 2. CƠ CHẾ BĂM MẬT KHẨU BẢO MẬT (BCRYPT HASHING)
 
-### Bước 1: Giao diện Form Đặt Hàng (Client / View)
-* **File:** [Views/Home/Index.cshtml](file:///E:/BanSachMvc/Views/Home/Index.cshtml) (vùng `#dat-hang`)
-* **Đoạn code xử lý:** Form Razor gửi dữ liệu `POST` sang action `DatHang` của `HomeController`:
-```html
-<form asp-controller="Home" asp-action="DatHang" method="post" id="orderForm">
-    @Html.AntiForgeryToken()
+1. **Khi Đăng ký tài khoản mới ([Services/AuthService.cs](file:///E:/BanSachMvc/Services/AuthService.cs)):**
+   * Mật khẩu được băm: `string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.MatKhau);`
+   * BCrypt tự động tạo Salt ngẫu nhiên 128-bit chống lại tấn công Rainbow Table.
+   * Gọi `_userRepo.AddAsync(newUser)` để lưu chuỗi băm vào bảng `NguoiDung`.
+
+2. **Khi Đăng nhập:**
+   * Lấy tài khoản từ `_userRepo.GetByUsernameAsync(username)`.
+   * So khớp mật khẩu: `bool hopLe = BCrypt.Net.BCrypt.Verify(model.MatKhau, user.MatKhau);`
+   * Trả về `true` nếu đúng, `false` nếu sai mà không bao giờ giải mã ngược mật khẩu.
+
+---
+
+## 3. LUỒNG 1: ĐĂNG NHẬP & XÁC THỰC JWT TOKEN (AUTH FLOW)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Người Dùng (Admin / User)
+    participant View as View: Account/DangNhap.cshtml
+    participant Controller as AccountController
+    participant AuthService as AuthService
+    participant UserRepo as NguoiDungRepository
+    participant JwtService as JwtService
+    participant HttpCtx as HttpContext (Cookie & Claims)
+
+    User->>View: 1. Nhập Username, Password & Submit Form
+    View->>Controller: 2. POST /Account/DangNhap (LoginViewModel)
+    Note over Controller: 3. Kiểm tra ModelState.IsValid
+    Controller->>AuthService: 4. DangNhapAsync(model)
+    AuthService->>UserRepo: 5. GetByUsernameAsync(username)
+    UserRepo-->>AuthService: 6. Trả về thực thể NguoiDung từ SQLite
+    Note over AuthService: 7. BCrypt.Verify(model.MatKhau, user.MatKhau)
+    AuthService->>JwtService: 8. TaoToken(user)
+    JwtService-->>AuthService: 9. Trả về chuỗi JWT Token ký HMAC-SHA256
+    AuthService-->>Controller: 10. Trả về AuthResult (Success, Token, User)
+    Controller->>HttpCtx: 11. Ghi Cookie 'access_token' & Gán ClaimsPrincipal (Id, Name, Role)
     
-    <!-- Họ tên -->
-    <input asp-for="DatHangForm.HoTen" class="form-control" placeholder="Họ và tên..." />
-    <span asp-validation-for="DatHangForm.HoTen" class="text-danger"></span>
-
-    <!-- Số điện thoại -->
-    <input asp-for="DatHangForm.SoDienThoai" class="form-control" placeholder="0987654321" />
-    <span asp-validation-for="DatHangForm.SoDienThoai" class="text-danger"></span>
-
-    <!-- Địa chỉ nhận hàng -->
-    <input asp-for="DatHangForm.DiaChi" class="form-control" placeholder="Địa chỉ giao hàng..." />
-    <span asp-validation-for="DatHangForm.DiaChi" class="text-danger"></span>
-
-    <!-- Số lượng (JS tính tiền tự động) -->
-    <input asp-for="DatHangForm.SoLuong" id="inputSoLuong" type="number" min="1" max="20" />
-
-    <!-- Phương thức thanh toán -->
-    <input type="radio" asp-for="DatHangForm.PhuongThucThanhToan" value="COD" checked /> COD
-    <input type="radio" asp-for="DatHangForm.PhuongThucThanhToan" value="ChuyenKhoan" /> Chuyển khoản
-
-    <!-- Nút Submit -->
-    <button type="submit" class="btn btn-primary-custom">XÁC NHẬN ĐẶT HÀNG NGAY</button>
-</form>
+    alt Role == 'Admin'
+        Controller-->>User: 12a. RedirectToAction("Index", "QuanTri")
+    else Role == 'User'
+        Controller-->>User: 12b. RedirectToAction("Index", "Home") / ReturnUrl
+    end
 ```
 
 ---
 
-### Bước 2: Controller Tiếp Nhận Request
-* **File:** [Controllers/HomeController.cs](file:///E:/BanSachMvc/Controllers/HomeController.cs)
-* **Action:** `[HttpPost] public async Task<IActionResult> DatHang(DatHangViewModel datHangForm)`
-* **Nhiệm vụ:**
-  1. Kiểm tra validation cơ bản (`ModelState.IsValid`: số điện thoại 10 chữ số, họ tên, địa chỉ không rỗng).
-  2. Không trực tiếp xử lý database, mà chuyển toàn bộ dữ liệu xuống tầng Service `_donHangService.TaoDonHangAsync(...)`.
-```csharp
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> DatHang(DatHangViewModel datHangForm)
-{
-    var sach = await _sachService.LaySachChinhAsync();
-    if (sach == null) return NotFound();
+## 4. LUỒNG 2: ĐẶT MUA SÁCH TRỰC TUYẾN (CUSTOMER ORDER FLOW)
 
-    datHangForm.Sach = sach;
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Customer as Khách Hàng (Đã đăng nhập)
+    participant View as View: Home/Index.cshtml (#dat-hang)
+    participant Controller as HomeController
+    participant DonHangService as DonHangService
+    participant SachRepo as SachRepository
+    participant DonHangRepo as DonHangRepository
+    participant CamOnView as View: Home/CamOn.cshtml
 
-    // 1. Nếu form nhập sai định dạng (ví dụ SĐT sai cú pháp)
-    if (!ModelState.IsValid)
-    {
-        var feedbacks = await _feedbackService.LayFeedbackDaDuyetAsync(sach.Id);
-        var vm = new LandingPageViewModel { Sach = sach, Feedbacks = feedbacks, DatHangForm = datHangForm };
-        return View("Index", vm);
-    }
-
-    // 2. Gọi Service xử lý đặt hàng
-    var (thanhCong, loi, donHang) = await _donHangService.TaoDonHangAsync(datHangForm);
+    Customer->>View: 1. Chọn Số lượng, Kiểm tra địa chỉ, Chọn PTTT & Bấm "Xác Nhận Đặt Hàng"
+    View->>Controller: 2. POST /Home/DatHang (DatHangViewModel)
     
-    // 3. Nếu Service báo lỗi nghiệp vụ (ví dụ hết hàng)
-    if (!thanhCong || donHang == null)
-    {
-        ModelState.AddModelError(string.Empty, loi ?? "Đã xảy ra lỗi khi tạo đơn hàng.");
-        var feedbacks = await _feedbackService.LayFeedbackDaDuyetAsync(sach.Id);
-        var vm = new LandingPageViewModel { Sach = sach, Feedbacks = feedbacks, DatHangForm = datHangForm };
-        return View("Index", vm);
-    }
-
-    // 4. Đặt thành công -> Điều hướng sang trang Cảm ơn
-    return RedirectToAction(nameof(CamOn), new { id = donHang.Id });
-}
+    alt Chưa đăng nhập
+        Controller-->>Customer: Chuyển hướng sang /Account/DangNhap
+    else Đã đăng nhập
+        Note over Controller: 3. Lấy UserId từ Claims
+        Controller->>DonHangService: 4. TaoDonHangAsync(datHangForm, userId)
+        DonHangService->>SachRepo: 5. GetFirstAsync()
+        SachRepo-->>DonHangService: 6. Trả về thông tin Sách & SoLuongTon
+        
+        alt Hết hàng (SoLuong > SoLuongTon)
+            DonHangService-->>Controller: Trả về (false, "Kho không đủ sách")
+            Controller-->>View: Render lại View("Index") kèm lỗi đỏ
+        else Đủ hàng
+            Note over DonHangService: 7. Trừ tồn kho: sach.SoLuongTon -= model.SoLuong<br/>8. Khởi tạo DonHang (TrangThai = 'Chờ xử lý')
+            DonHangService->>SachRepo: 9. UpdateAsync(sach)
+            DonHangService->>DonHangRepo: 10. AddAsync(donHang)
+            DonHangRepo-->>DonHangService: 11. Đã ghi vào SQLite & sinh Id mới
+            DonHangService-->>Controller: 12. Trả về (true, null, donHang)
+            Controller-->>Customer: 13. RedirectToAction("CamOn", new { id = donHang.Id })
+            Customer->>CamOnView: 14. Hiển thị hóa đơn xác nhận đơn hàng
+        end
+    end
 ```
 
 ---
 
-### Bước 3: Tầng Service Xử Lý Nghiệp Vụ (Business Logic)
-* **File Interface:** [Services/IDonHangService.cs](file:///E:/BanSachMvc/Services/IDonHangService.cs)
-* **File Implementation:** [Services/DonHangService.cs](file:///E:/BanSachMvc/Services/DonHangService.cs)
-* **Nhiệm vụ:**
-  1. Kiểm tra sách có tồn tại trong hệ thống hay không.
-  2. Kiểm tra số lượng đặt mua so với số lượng còn lại trong kho (`model.SoLuong > sach.SoLuongTon`).
-  3. Trừ số lượng tồn kho của sách (`sach.SoLuongTon -= model.SoLuong`).
-  4. Tính tổng tiền: `TongTien = sach.Gia * model.SoLuong`.
-  5. Thêm thực thể `DonHang` mới vào database và gọi `_db.SaveChangesAsync()`.
-```csharp
-public async Task<(bool ThanhCong, string? ThongBaoLoi, DonHang? DonHang)> TaoDonHangAsync(DatHangViewModel model)
-{
-    var sach = await _db.Sach.FirstOrDefaultAsync();
-    if (sach == null)
-    {
-        return (false, "Không tìm thấy thông tin sản phẩm sách.", null);
-    }
+## 5. LUỒNG 3: ADMIN QUẢN LÝ HÓA ĐƠN & THỐNG KÊ DOANH THU
 
-    if (model.SoLuong <= 0)
-    {
-        return (false, "Số lượng đặt mua phải lớn hơn 0.", null);
-    }
+1. **Truy cập Dashboard Quản Trị (`GET /QuanTri`):**
+   * Bảo vệ bởi thuộc tính `[Authorize(Roles = "Admin")]`.
+   * Controller gọi [`DonHangService.LayThongKeAsync()`](file:///E:/BanSachMvc/Services/DonHangService.cs) $\rightarrow$ gọi [`DonHangRepository.GetStatsAsync()`](file:///E:/BanSachMvc/Repositories/DonHangRepository.cs) tính toán thống kê KPI.
+   * Controller gọi [`DonHangService.LayDanhSachDonHangAsync(trangThai, timKiem)`](file:///E:/BanSachMvc/Services/DonHangService.cs) $\rightarrow$ gọi [`DonHangRepository.GetAllAsync(trangThai, timKiem)`](file:///E:/BanSachMvc/Repositories/DonHangRepository.cs) với LINQ `.Include(d => d.NguoiDung)` và `.Include(d => d.Sach)` để đổ dữ liệu xuống bảng Data Table trong [Views/QuanTri/Index.cshtml](file:///E:/BanSachMvc/Views/QuanTri/Index.cshtml).
 
-    // Kiểm tra tồn kho
-    if (model.SoLuong > sach.SoLuongTon)
-    {
-        return (false, $"Số lượng trong kho chỉ còn {sach.SoLuongTon} cuốn, không đủ để giao.", null);
-    }
-
-    // Tạo đơn hàng mới
-    var donHang = new DonHang
-    {
-        SachId = sach.Id,
-        HoTen = model.HoTen.Trim(),
-        SoDienThoai = model.SoDienThoai.Trim(),
-        DiaChi = model.DiaChi.Trim(),
-        PhuongThucThanhToan = model.PhuongThucThanhToan,
-        GhiChu = model.GhiChu?.Trim(),
-        SoLuong = model.SoLuong,
-        TongTien = sach.Gia * model.SoLuong,
-        NgayDat = DateTime.Now,
-        TrangThai = "Chờ xử lý"
-    };
-
-    // Giảm số lượng tồn kho của cuốn sách
-    sach.SoLuongTon -= model.SoLuong;
-    
-    // Lưu vào cơ sở dữ liệu SQLite
-    _db.DonHang.Add(donHang);
-    await _db.SaveChangesAsync();
-
-    return (true, null, donHang);
-}
-```
+2. **Duyệt giao hàng / Đổi trạng thái hóa đơn (`POST /QuanTri/CapNhatTrangThai`):**
+   * Form gửi `id` và `trangThaiMoi`.
+   * Controller gọi `_donHangService.CapNhatTrangThaiAsync(id, trangThaiMoi)` $\rightarrow$ gọi `_donHangRepo.UpdateStatusAsync(id, trangThaiMoi)`.
+   * Cập nhật cột `TrangThai` trong bảng `DonHang` của SQLite.
 
 ---
 
-### Bước 4: Hiển Thị Trang Cảm Ơn / Hóa Đơn (Thank You Page)
-* **Controller:** Action [`HomeController.CamOn(int id)`](file:///E:/BanSachMvc/Controllers/HomeController.cs)
-```csharp
-[HttpGet]
-public async Task<IActionResult> CamOn(int id)
-{
-    var don = await _donHangService.LayDonHangTheoIdAsync(id);
-    if (don == null) return NotFound();
-    return View(don);
-}
-```
-* **View:** [Views/Home/CamOn.cshtml](file:///E:/BanSachMvc/Views/Home/CamOn.cshtml) nhận model `DonHang` và hiển thị:
-  * Mã đơn hàng: `#@Model.Id`
-  * Thông tin khách hàng & địa chỉ giao hàng
-  * Sản phẩm, số lượng, tổng tiền thanh toán
-  * Hướng dẫn thanh toán (nếu chọn chuyển khoản) và nút In hóa đơn.
+## 6. BẢNG TỔNG HỢP ÁNH XẠ TOÀN BỘ 4 TẦNG
 
----
+| Chức Năng | Controller | Service Xử Lý | Repository Tương Tác | Bảng Database | Kết Quả Trả Về |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Đăng Nhập** | `AccountController.DangNhap` | `AuthService` (BCrypt), `JwtService` | `NguoiDungRepository` | `NguoiDung` (Select) | Cấp JWT Token + Cookie $\rightarrow$ Redirect |
+| **Đăng Ký** | `AccountController.DangKy` | `AuthService.DangKyAsync` | `NguoiDungRepository` | `NguoiDung` (Insert) | Tạo tài khoản $\rightarrow$ Tự động đăng nhập |
+| **Đặt Sách Mua** | `HomeController.DatHang` | `DonHangService.TaoDonHangAsync` | `SachRepository`, `DonHangRepository` | `Sach` (Update), `DonHang` (Insert) | Redirect `/Home/CamOn/{id}` |
+| **Xem Hóa Đơn** | `HomeController.CamOn` | `DonHangService.LayDonHangTheoIdAsync` | `DonHangRepository` | `DonHang`, `Sach` (Select) | View `CamOn.cshtml` |
+| **Lịch Sử Đơn** | `AccountController.LichSuDonHang` | `DonHangService.LayDanhSachDonHangCuaUserAsync` | `DonHangRepository` | `DonHang` (Select WHERE NguoiDungId) | View `LichSuDonHang.cshtml` |
+| **Admin Hóa Đơn** | `QuanTriController.Index` | `DonHangService.LayDanhSachDonHangAsync` | `DonHangRepository` | `DonHang`, `NguoiDung` (Select JOIN) | View `Index.cshtml` (Dashboard & KPI) |
+| **Chi Tiết HĐ** | `QuanTriController.ChiTietHoaDon` | `DonHangService.LayDonHangTheoIdAsync` | `DonHangRepository` | `DonHang`, `Sach` (Select) | View `ChiTietHoaDon.cshtml` |
+| **Đổi Trạng Thái**| `QuanTriController.CapNhatTrangThai` | `DonHangService.CapNhatTrangThaiAsync` | `DonHangRepository` | `DonHang` (Update TrangThai) | Redirect `/QuanTri` |
+| **Quản Lý Feedback**| `QuanTriController.QuanLyFeedback` | `FeedbackService.LayTatCaFeedbackAsync` | `FeedbackRepository` | `Feedback` (Select) | View `QuanLyFeedback.cshtml` |

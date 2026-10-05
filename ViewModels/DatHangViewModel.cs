@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using BanSach.Models;
 
-namespace BanSach.Models;
+namespace BanSach.ViewModels;
 
 public class DatHangViewModel
 {

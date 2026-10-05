@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BanSach.Models;
+namespace BanSach.ViewModels;
 
 public class FeedbackViewModel
 {

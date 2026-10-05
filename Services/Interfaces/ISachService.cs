@@ -1,6 +1,6 @@
 using BanSach.Models;
 
-namespace BanSach.Services;
+namespace BanSach.Services.Interfaces;
 
 public interface ISachService
 {

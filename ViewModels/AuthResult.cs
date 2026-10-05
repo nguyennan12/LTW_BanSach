@@ -1,4 +1,6 @@
-namespace BanSach.Models;
+using BanSach.Models;
+
+namespace BanSach.ViewModels;
 
 public class AuthResult
 {

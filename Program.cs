@@ -1,6 +1,9 @@
 using System.Text;
 using BanSach.Data;
+using BanSach.Repositories;
+using BanSach.Repositories.Interfaces;
 using BanSach.Services;
+using BanSach.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -12,14 +15,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
-// 2. Đăng ký Dependency Injection cho các Services
+// 2. Đăng ký Dependency Injection cho tầng Repositories (Data Access Layer)
+builder.Services.AddScoped<ISachRepository, SachRepository>();
+builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
+builder.Services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+
+// 3. Đăng ký Dependency Injection cho tầng Services (Business Logic Layer)
 builder.Services.AddScoped<ISachService, SachService>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// 3. Cấu hình Xác thực Đăng Nhập (Cookie + JWT Bearer)
+// 4. Cấu hình Xác thực Đăng Nhập (Cookie + JWT Bearer)
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "BanSachSecretKeyForJwtAuthentication2026SuperSecureKey!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "BanSachMvc";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "BanSachMvcClient";
@@ -58,7 +67,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// 4. Khởi tạo Database và Seed dữ liệu ban đầu
+// 5. Khởi tạo Database và BĂM TOÀN BỘ MẬT KHẨU TRONG BẢNG NGUOIDUNG BẰNG BCRYPT
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BanSach.Models;
-using BanSach.Services;
+using BanSach.Services.Interfaces;
+using BanSach.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -56,7 +57,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        // Lưu JWT token vào Cookie để có thể dùng cả cho Client/API
+        // Lưu JWT token vào Cookie
         Response.Cookies.Append("access_token", result.Token ?? "", new CookieOptions
         {
             HttpOnly = true,

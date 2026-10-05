@@ -1,6 +1,7 @@
 using BanSach.Models;
+using BanSach.ViewModels;
 
-namespace BanSach.Services;
+namespace BanSach.Services.Interfaces;
 
 public interface IFeedbackService
 {
