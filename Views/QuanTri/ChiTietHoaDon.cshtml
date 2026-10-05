@@ -1,0 +1,135 @@
+@model DonHang
+@using System.Globalization
+@{
+    ViewData["Title"] = $"Chi Tiết Hóa Đơn #{Model.Id}";
+    var vn = CultureInfo.GetCultureInfo("vi-VN");
+    string badgeClass = Model.TrangThai switch
+    {
+        "Chờ xử lý" => "badge-cho-xu-ly",
+        "Đang giao" => "badge-dang-giao",
+        "Đã giao" => "badge-da-giao",
+        _ => "badge-da-huy"
+    };
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="/QuanTri" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách hóa đơn
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-printer me-1"></i> In hóa đơn
+                </button>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-primary text-white p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-warning text-dark fw-bold mb-1">HÓA ĐƠN BÁN HÀNG</span>
+                        <h3 class="fw-bold mb-0">HÓA ĐƠN #@Model.Id</h3>
+                        <div class="small text-white-50 mt-1">Ngày lập: @Model.NgayDat.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-white-50">Trạng thái:</div>
+                        <span class="badge badge-status @badgeClass fs-6">@Model.TrangThai</span>
+                    </div>
+                </div>
+
+                <div class="p-4 p-lg-5">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">THÔNG TIN KHÁCH HÀNG</h6>
+                            <p class="mb-1">Họ tên: <b>@Model.HoTen</b></p>
+                            <p class="mb-1">Số điện thoại: <a href="tel:@Model.SoDienThoai" class="text-decoration-none fw-semibold">@Model.SoDienThoai</a></p>
+                            <p class="mb-1">Địa chỉ giao: @Model.DiaChi</p>
+                            @if (Model.NguoiDung != null)
+                            {
+                                <p class="mb-0 text-muted small">Tài khoản thành viên: <b>@@@Model.NguoiDung.TenDangNhap</b></p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">PHƯƠNG THỨC & GHI CHÚ</h6>
+                            <p class="mb-1">Hình thức thanh toán: 
+                                <span class="badge @(Model.PhuongThucThanhToan == "COD" ? "bg-light text-dark border" : "bg-primary-subtle text-primary border")">
+                                    @(Model.PhuongThucThanhToan == "COD" ? "Thanh toán tiền mặt khi nhận hàng (COD)" : "Chuyển khoản Ngân hàng / QR Pay")
+                                </span>
+                            </p>
+                            @if (!string.IsNullOrEmpty(Model.GhiChu))
+                            {
+                                <p class="mb-1 text-muted">Ghi chú của khách: <i>@Model.GhiChu</i></p>
+                            }
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">CHI TIẾT SẢN PHẨM ĐẶT MUA</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@(Model.Sach?.Ten ?? "Nhà Giả Kim (The Alchemist)")</div>
+                                        <div class="small text-muted">Tác giả: Paulo Coelho | NXB Hội Nhà Văn</div>
+                                    </td>
+                                    <td class="text-center fw-bold">@Model.SoLuong</td>
+                                    <td class="text-end">@((Model.Sach?.Gia ?? 89000).ToString("N0", vn)) đ</td>
+                                    <td class="text-end fw-bold text-danger">@Model.TongTien.ToString("N0", vn) đ</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold">Phí vận chuyển:</td>
+                                    <td class="text-end text-success fw-semibold">Miễn phí (0 đ)</td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td colspan="3" class="text-end fw-bold fs-5">TỔNG CỘNG THANH TOÁN:</td>
+                                    <td class="text-end fw-bold text-danger fs-5">@Model.TongTien.ToString("N0", vn) đ</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Thao tác thay đổi trạng thái -->
+                    <div class="card bg-light border-0 p-3 rounded-3">
+                        <h6 class="fw-bold text-dark mb-2">Thao tác xử lý đơn hàng:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <form asp-action="CapNhatTrangThai" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="trangThaiMoi" value="Chờ xử lý" />
+                                <button type="submit" class="btn btn-sm btn-outline-warning @(Model.TrangThai == "Chờ xử lý" ? "active fw-bold" : "")">Chờ xử lý</button>
+                            </form>
+                            <form asp-action="CapNhatTrangThai" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="trangThaiMoi" value="Đang giao" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary @(Model.TrangThai == "Đang giao" ? "active fw-bold" : "")"><i class="bi bi-truck me-1"></i>Đang giao hàng</button>
+                            </form>
+                            <form asp-action="CapNhatTrangThai" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="trangThaiMoi" value="Đã giao" />
+                                <button type="submit" class="btn btn-sm btn-outline-success @(Model.TrangThai == "Đã giao" ? "active fw-bold" : "")"><i class="bi bi-check2-circle me-1"></i>Hoàn tất (Đã giao)</button>
+                            </form>
+                            <form asp-action="CapNhatTrangThai" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn hủy hóa đơn này?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="trangThaiMoi" value="Đã hủy" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger @(Model.TrangThai == "Đã hủy" ? "active fw-bold" : "")"><i class="bi bi-x-circle me-1"></i>Hủy đơn</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

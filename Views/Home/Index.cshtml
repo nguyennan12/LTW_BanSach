@@ -338,8 +338,44 @@
                     </div>
 
                     <div class="p-4 p-lg-5">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="alert alert-success d-flex align-items-center justify-content-between mb-4 border-0 rounded-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-person-check-fill fs-4 text-success"></i>
+                                    <div>
+                                        Đang đặt mua với tài khoản: <b>@User.Identity.Name</b>
+                                        <div class="small text-muted">Thông tin nhận hàng đã được tự động điền sẵn cho bạn.</div>
+                                    </div>
+                                </div>
+                                <a href="/Account/LichSuDonHang" class="btn btn-sm btn-outline-success rounded-pill fw-semibold">
+                                    <i class="bi bi-clock-history me-1"></i> Xem đơn đã mua
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 border-0 rounded-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-lock-fill fs-4 text-warning"></i>
+                                    <div>
+                                        <b>Yêu cầu đăng nhập:</b> Vui lòng đăng nhập tài khoản trước khi đặt mua sách.
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="/Account/DangNhap?returnUrl=%2F%23dat-hang" class="btn btn-sm btn-primary rounded-pill fw-bold px-3">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập ngay
+                                    </a>
+                                    <a href="/Account/DangKy" class="btn btn-sm btn-outline-dark rounded-pill fw-semibold">
+                                        Đăng ký
+                                    </a>
+                                </div>
+                            </div>
+                        }
+
                         <form asp-controller="Home" asp-action="DatHang" method="post" id="orderForm">
                             @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="DatHangForm.NguoiDungId" />
                             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                             <div class="row g-4">

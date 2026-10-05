@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BanSach.Models;
 using BanSach.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,18 @@ public class HomeController : Controller
     private readonly ISachService _sachService;
     private readonly IDonHangService _donHangService;
     private readonly IFeedbackService _feedbackService;
+    private readonly IAuthService _authService;
 
     public HomeController(
         ISachService sachService,
         IDonHangService donHangService,
-        IFeedbackService feedbackService)
+        IFeedbackService feedbackService,
+        IAuthService authService)
     {
         _sachService = sachService;
         _donHangService = donHangService;
         _feedbackService = feedbackService;
+        _authService = authService;
     }
 
     // Trang chủ Landing Page: GET /
@@ -29,17 +33,36 @@ public class HomeController : Controller
 
         var feedbacks = await _feedbackService.LayFeedbackDaDuyetAsync(sach.Id);
 
+        var datHangForm = new DatHangViewModel { Sach = sach, SoLuong = 1 };
+
+        // Nếu người dùng đã đăng nhập -> Tự động điền thông tin người dùng
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdStr, out var userId))
+            {
+                var user = await _authService.LayNguoiDungTheoIdAsync(userId);
+                if (user != null)
+                {
+                    datHangForm.NguoiDungId = user.Id;
+                    datHangForm.HoTen = user.HoTen;
+                    datHangForm.SoDienThoai = user.SoDienThoai;
+                    datHangForm.DiaChi = user.DiaChi;
+                }
+            }
+        }
+
         var vm = new LandingPageViewModel
         {
             Sach = sach,
             Feedbacks = feedbacks,
-            DatHangForm = new DatHangViewModel { Sach = sach, SoLuong = 1 }
+            DatHangForm = datHangForm
         };
 
         return View(vm);
     }
 
-    // Xử lý gửi Form Đặt Hàng: POST /Home/DatHang hoặc POST /
+    // Xử lý gửi Form Đặt Hàng: POST /Home/DatHang
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DatHang(DatHangViewModel datHangForm)
@@ -48,6 +71,22 @@ public class HomeController : Controller
         if (sach == null) return NotFound();
 
         datHangForm.Sach = sach;
+
+        // BẮT BUỘC ĐĂNG NHẬP KHI MUA SÁCH THEO YÊU CẦU
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            TempData["ErrorMsg"] = "Bạn cần đăng nhập tài khoản trước khi đặt mua sách!";
+            return RedirectToAction("DangNhap", "Account", new { returnUrl = "/#dat-hang" });
+        }
+
+        // Lấy User ID của tài khoản đang đăng nhập
+        int? userId = null;
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(userIdStr, out var parsedId))
+        {
+            userId = parsedId;
+            datHangForm.NguoiDungId = parsedId;
+        }
 
         if (!ModelState.IsValid)
         {
@@ -61,7 +100,7 @@ public class HomeController : Controller
             return View("Index", vm);
         }
 
-        var (thanhCong, loi, donHang) = await _donHangService.TaoDonHangAsync(datHangForm);
+        var (thanhCong, loi, donHang) = await _donHangService.TaoDonHangAsync(datHangForm, userId);
         if (!thanhCong || donHang == null)
         {
             ModelState.AddModelError(string.Empty, loi ?? "Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại!");
@@ -95,7 +134,7 @@ public class HomeController : Controller
         if (ModelState.IsValid)
         {
             await _feedbackService.GuiFeedbackAsync(feedbackForm);
-            TempData["SuccessMsg"] = "Cảm ơn bạn đã gửi đánh giá! Ý kiến của bạn đã được ghi nhận.";
+            TempData["SuccessMsg"] = "Cảm ơn bạn đã gửi đánh giá! Nhận xét của bạn đã được ghi nhận.";
         }
         else
         {

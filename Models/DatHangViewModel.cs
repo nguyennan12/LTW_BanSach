@@ -6,6 +6,8 @@ public class DatHangViewModel
 {
     public Sach? Sach { get; set; }
 
+    public int? NguoiDungId { get; set; }
+
     [Required(ErrorMessage = "Vui lòng nhập họ và tên của bạn")]
     [StringLength(100, ErrorMessage = "Họ tên không vượt quá 100 ký tự")]
     public string HoTen { get; set; } = "";

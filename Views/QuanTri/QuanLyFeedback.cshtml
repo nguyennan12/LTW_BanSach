@@ -1,0 +1,95 @@
+@model List<Feedback>
+@{
+    ViewData["Title"] = "Quản lý Đánh giá Độc giả";
+}
+
+<div class="container-fluid py-4 px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 font-serif">QUẢN LÝ ĐÁNH GIÁ & FEEDBACK</h2>
+            <div class="text-muted small">Duyệt hoặc ẩn nhận xét của độc giả trên trang Landing</div>
+        </div>
+        <div>
+            <a href="/QuanTri" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại Quản lý Hóa đơn
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover table-custom mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Khách Hàng</th>
+                        <th>Số Sao</th>
+                        <th>Nội Dung Nhận Xét</th>
+                        <th>Ngày Đánh Giá</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-end">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var fb in Model)
+                        {
+                            <tr>
+                                <td>@fb.Id</td>
+                                <td class="fw-bold text-dark">@fb.HoTen</td>
+                                <td>
+                                    <span class="text-warning">
+                                        @for (int i = 0; i < fb.SoSao; i++)
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                    </span>
+                                </td>
+                                <td style="max-width: 400px; white-space: normal;">
+                                    @fb.NoiDung
+                                </td>
+                                <td class="small text-muted">@fb.NgayDanhGia.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (fb.Duyet)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success">Hiển thị</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border">Đang ẩn</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-2">
+                                        <form asp-action="DuyetFeedback" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@fb.Id" />
+                                            <input type="hidden" name="duyet" value="@(!fb.Duyet)" />
+                                            <button type="submit" class="btn btn-sm @(fb.Duyet ? "btn-outline-warning" : "btn-outline-success")">
+                                                @(fb.Duyet ? "Ẩn đi" : "Duyệt hiển thị")
+                                            </button>
+                                        </form>
+                                        <form asp-action="XoaFeedback" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa đánh giá này?')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@fb.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">Chưa có đánh giá nào từ độc giả.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

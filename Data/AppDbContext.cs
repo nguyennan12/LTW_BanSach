@@ -10,10 +10,37 @@ public class AppDbContext : DbContext
     public DbSet<Sach> Sach => Set<Sach>();
     public DbSet<DonHang> DonHang => Set<DonHang>();
     public DbSet<Feedback> Feedback => Set<Feedback>();
+    public DbSet<NguoiDung> NguoiDung => Set<NguoiDung>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
-        // Seed thông tin sách "Nhà Giả Kim"
+        // 1. Seed tài khoản Admin và User mặc định
+        b.Entity<NguoiDung>().HasData(
+            new NguoiDung
+            {
+                Id = 1,
+                TenDangNhap = "admin",
+                MatKhau = "admin123", // Mật khẩu Admin
+                HoTen = "Quản Trị Viên",
+                SoDienThoai = "0988888888",
+                DiaChi = "Hà Nội",
+                VaiTro = "Admin",
+                NgayTao = new DateTime(2026, 1, 1)
+            },
+            new NguoiDung
+            {
+                Id = 2,
+                TenDangNhap = "khachhang",
+                MatKhau = "123456", // Mật khẩu User
+                HoTen = "Nguyễn Văn Khách",
+                SoDienThoai = "0912345678",
+                DiaChi = "123 Đường Sách, Quận 1, TP. Hồ Chí Minh",
+                VaiTro = "User",
+                NgayTao = new DateTime(2026, 1, 2)
+            }
+        );
+
+        // 2. Seed thông tin sách "Nhà Giả Kim"
         b.Entity<Sach>().HasData(new Sach
         {
             Id = 1,
@@ -32,7 +59,7 @@ public class AppDbContext : DbContext
             FilePreview = "#doc-thu"
         });
 
-        // Seed feedback mẫu
+        // 3. Seed feedback mẫu
         b.Entity<Feedback>().HasData(
             new Feedback
             {

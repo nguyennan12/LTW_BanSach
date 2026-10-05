@@ -13,7 +13,7 @@ public class DonHangService : IDonHangService
         _db = db;
     }
 
-    public async Task<(bool ThanhCong, string? ThongBaoLoi, DonHang? DonHang)> TaoDonHangAsync(DatHangViewModel model)
+    public async Task<(bool ThanhCong, string? ThongBaoLoi, DonHang? DonHang)> TaoDonHangAsync(DatHangViewModel model, int? nguoiDungId = null)
     {
         var sach = await _db.Sach.FirstOrDefaultAsync();
         if (sach == null)
@@ -34,6 +34,7 @@ public class DonHangService : IDonHangService
         var donHang = new DonHang
         {
             SachId = sach.Id,
+            NguoiDungId = nguoiDungId ?? model.NguoiDungId,
             HoTen = model.HoTen.Trim(),
             SoDienThoai = model.SoDienThoai.Trim(),
             DiaChi = model.DiaChi.Trim(),
@@ -57,12 +58,16 @@ public class DonHangService : IDonHangService
     {
         return await _db.DonHang
             .Include(d => d.Sach)
+            .Include(d => d.NguoiDung)
             .FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<List<DonHang>> LayDanhSachDonHangAsync(string? trangThai = null, string? timKiem = null)
     {
-        var query = _db.DonHang.Include(d => d.Sach).AsQueryable();
+        var query = _db.DonHang
+            .Include(d => d.Sach)
+            .Include(d => d.NguoiDung)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(trangThai) && trangThai != "Tất cả")
         {
@@ -79,6 +84,15 @@ public class DonHangService : IDonHangService
         }
 
         return await query.OrderByDescending(d => d.Id).ToListAsync();
+    }
+
+    public async Task<List<DonHang>> LayDanhSachDonHangCuaUserAsync(int nguoiDungId)
+    {
+        return await _db.DonHang
+            .Include(d => d.Sach)
+            .Where(d => d.NguoiDungId == nguoiDungId)
+            .OrderByDescending(d => d.Id)
+            .ToListAsync();
     }
 
     public async Task<bool> CapNhatTrangThaiAsync(int id, string trangThaiMoi)
